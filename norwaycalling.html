@@ -1,0 +1,43 @@
+<head></head>
+<body>
+    <div style="vertical-align: top;">
+        <div><video id="video" autoplay playsinline muted></video></div>
+        <div><button id="button">Hello, this is Norway calling...</button></div>
+    </div>
+    <div style="display: inline-block; vertical-align: top;">
+        <div><textarea id="offer" cols="80" rows="24"></textarea></div>
+    </div>
+    <div style="display: inline-block; vertical-align: top;">
+        <div><textarea id="answer" cols="80" rows="24"></textarea></div>
+        <div><button id="answer">Use answer</button></div>
+    </div>
+
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script>
+        document.querySelector("#button").addEventListener("click", e => {
+            navigator.mediaDevices
+                .getUserMedia({ audio: true, video: true })
+                .then(stream => {
+                    const video = document.querySelector("#video");
+                    video.srcObject = stream;
+
+                    const pc = window.pc = new RTCPeerConnection();
+                    pc.addTrack(stream.getVideoTracks()[0]);
+                    pc.addTrack(stream.getAudioTracks()[0]);
+                    pc.onicecandidate = event => {
+                        if (!event.candidate) {
+                            document.querySelector("textarea#offer")
+                                .value = pc.localDescription.sdp;
+                        }
+                    };
+                    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+                })
+                .catch(err => alert(`Get user media failed: ${err}`));
+        });
+
+        document.querySelector("button#answer").addEventListener("click", e => {
+            const answer = document.querySelector("textarea#answer").value;
+            window.pc.setRemoteDescription({ type: "answer", sdp: answer });
+        });
+    </script>
+</body>
