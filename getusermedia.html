@@ -1,0 +1,22 @@
+<head></head>
+<body>
+    <div style="vertical-align: top;">
+        <div><video id="video" autoplay playsinline muted></video></div>
+        <div><button id="button">Get User Media</button></div>
+    </div>
+    <div style="display: inline-block; vertical-align: top;"></div>
+    <div style="display: inline-block; vertical-align: top;"></div>
+
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script>
+        document.querySelector("#button").addEventListener("click", e => {
+            navigator.mediaDevices
+                .getUserMedia({ audio: true, video: true })
+                .then(stream => {
+                    const video = document.querySelector("#video");
+                    video.srcObject = stream;
+                })
+                .catch(err => alert(`Get user media failed: ${err}`));
+        });
+    </script>
+</body>
